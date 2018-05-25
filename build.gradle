@@ -1,0 +1,78 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.ajoberstar.grgit' version '2.2.0'
+    id 'com.github.ben-manes.versions' version '0.17.0'
+}
+
+group 'com.nsn.benchmark'
+version '0.0.1'
+
+description = 'Test benchmarks.'
+def mainClass = 'com.nsn.benchmark.voltkv.AsyncBenchmark'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    // mavenLocal()
+    mavenCentral()
+    maven {
+        url = 'https://nexus3.aplan.app/repository/maven-releases/'
+    }
+}
+
+dependencies {
+    compile 'org.slf4j:jcl-over-slf4j:1.7.25'
+    compile 'org.slf4j:slf4j-api:1.7.25'
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'ch.qos.logback:logback-core:1.2.3'
+
+    // voltdb client
+    compile 'org.voltdb:voltdbclient:8.0'
+
+    // redis client
+    compile 'redis.clients:jedis:2.9.0'
+
+    // JUnit Jupiter API and TestEngine implementation
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+}
+
+task copyDependencies(type: Copy) {
+    from configurations.compile
+    into 'build/lib'
+}
+
+jar {
+    ext.createAttributes = { ->
+        def attributes = [
+                'Manifest-Version'      : 1.0,
+                'Implementation-Title'  : project.name,
+                'Implementation-Version': version,
+                'Main-Class'            : mainClass,
+                'Class-Path'            : configurations.compile.collect { "./${it.getName()}" }.sort().join(' '),
+                'Description'           : project.description,
+                'Created-By'            : "Gradle $gradle.gradleVersion",
+                'Build-Jdk'             : project.ant.properties.get('java.version'),
+                'Class-Version'         : project.ant.properties.get('java.class.version'),
+        ]
+
+        try {
+            attributes.putAll([
+                    'Commit-By' : "${grgit.head().author.name} <${grgit.head().author.email}>",
+                    'Git-Commit': grgit.head().id,
+                    'Git-Branch': grgit.branch.current().fullName,
+            ])
+            if (grgit.remote.list().size() > 0) {
+                attributes.put('Implementation-URL', grgit.remote.list()[0].url)
+            }
+        } catch (ignored) {
+        }
+        return attributes
+    }
+    manifest {
+        attributes(createAttributes())
+    }
+}
