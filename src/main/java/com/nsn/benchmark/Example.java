@@ -92,9 +92,9 @@ public class Example {
 
     public static void main(String[] args) throws IOException {
         // 合成资源文件
-        Path fwPath = Paths.get("D:\\resources\\benchmark\\src\\test\\resources\\FWLOG_ST6B2F_FORT_20180524170442_0000.DAT");
+        Path fwPath = Paths.get("D:\\resources\\benchmark\\src\\main\\resources\\FWLOG_ST6B2F_FORT_20180524170442_0000.DAT");
         // 合成数据文件，在合成过程中，使用 [1:5] 个字段作为 key，找到对应的 value
-        Path gnPath = Paths.get("D:\\resources\\benchmark\\src\\test\\resources\\GN.TXT");
+        Path gnPath = Paths.get("D:\\resources\\benchmark\\src\\main\\resources\\GN.TXT");
 
         Example example = new Example();
         example.saveFirewall(fwPath);
