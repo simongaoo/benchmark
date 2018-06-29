@@ -107,10 +107,10 @@ public class AsyncBenchmark {
         int duration = 120;
 
         @Option(desc = "Warmup duration in seconds.")
-        int warmup = 5;
+        int warmup = 1;
 
         @Option(desc = "Comma separated list of the form server[:port] to connect to.")
-        String servers = "localhost";
+        String servers = "10.0.0.16,10.0.0.17,10.0.0.18";
 
         @Option(desc = "Number of keys to preload.")
         int poolsize = 100000;
@@ -481,6 +481,7 @@ public class AsyncBenchmark {
             System.out.println("Preloading complete.\n");
         }
 
+        Thread.yield();
         System.out.print(HORIZONTAL_RULE);
         System.out.println(" Starting Benchmark");
         System.out.println(HORIZONTAL_RULE);

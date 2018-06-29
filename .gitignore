@@ -20,6 +20,7 @@ local.properties
 *.launch
 
 # PyDev specific (Python IDE for Eclipse)
+# PyDev specific (Python IDE for Eclipse)
 *.pydevproject
 
 # CDT-specific (C/C++ Development Tooling)
@@ -114,6 +115,7 @@ gradle-app.setting
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
+!libs/voltdb-8.1.1.jar
 
 # Cache of project
 .gradletasknamecache
@@ -133,8 +135,8 @@ gradle-app.setting
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
-*.jar
+# Package Files #jar
+*.
 *.war
 *.nar
 *.ear

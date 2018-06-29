@@ -1,5 +1,7 @@
 package com.nsn.benchmark;
 
+import org.voltdb.CLIConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Inet4Address;
@@ -91,12 +93,17 @@ public class Example {
     }
 
     public static void main(String[] args) throws IOException {
+        String fw = args[0];
+        String gn = args[1];
         // 合成资源文件
-        Path fwPath = Paths.get("D:\\resources\\benchmark\\src\\main\\resources\\FWLOG_ST6B2F_FORT_20180524170442_0000.DAT");
+        Path fwPath = Paths.get(fw);
         // 合成数据文件，在合成过程中，使用 [1:5] 个字段作为 key，找到对应的 value
-        Path gnPath = Paths.get("D:\\resources\\benchmark\\src\\main\\resources\\GN.TXT");
+        Path gnPath = Paths.get(gn);
 
         Example example = new Example();
+        for (int i = 0; i < 10000; i++) {
+
+        }
         example.saveFirewall(fwPath);
         example.mergeData(gnPath);
     }
