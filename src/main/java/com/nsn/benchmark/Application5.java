@@ -39,8 +39,8 @@ public class Application5 {
             bulkLoader.insertRow(row[0], row);
         }
         bulkLoader.drain();
-        client.drain();
         bulkLoader.close();
+        client.drain();
         System.out.println("avg: " + all / stopwatch.stop().elapsed(TimeUnit.MILLISECONDS) * 1000);
     }
 

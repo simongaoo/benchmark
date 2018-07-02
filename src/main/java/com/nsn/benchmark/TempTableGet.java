@@ -1,12 +1,13 @@
 package com.nsn.benchmark;
 
 import com.google_voltpatches.common.base.Stopwatch;
-import com.nsn.benchmark.mapper.FirewallMapper;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.voltdb.VoltTable;
+import org.voltdb.VoltType;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.ClientResponse;
@@ -17,8 +18,6 @@ import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +63,6 @@ public class TempTableGet {
         }
         bulkLoader.flush();
         bulkLoader.drain();
-        client.drain();
         bulkLoader.close();
 
         logger.info("avg: {} / {} = {}", bulkLoader.getCompletedRowCount(),
@@ -72,13 +70,16 @@ public class TempTableGet {
                 bulkLoader.getCompletedRowCount() / stopwatch.elapsed(TimeUnit.MILLISECONDS) * 1000);
 
         // -- select
-        FirewallMapper mapper = session.getMapper(FirewallMapper.class);
-        List<Map<String, Object>> list = mapper.joinSelect(HOST, threadName, currentTime / 1000);
-        logger.info("found: {}", list.size());
+        ClientResponse response = client.callProcedure("SelectFromPair", HOST, threadName, currentTime / 1000);
+        int rowCount = response.getResults()[0].getRowCount();
+        logger.info("found: {}", rowCount);
         // -- delete
-        logger.info("delete: {}", mapper.delete(HOST, threadName, currentTime / 1000));
-        logger.info("get: {} / {} = {}, speed: {}/s", list.size(), batchSize, (double) list.size() / batchSize,
+        VoltTable table = client.callProcedure("DeleteFromPair", HOST, threadName, currentTime / 1000).getResults()[0];
+        table.advanceRow();
+        logger.info("delete: {}", table.get(0, VoltType.INTEGER));
+        logger.info("get: {} / {} = {}, speed: {}/s", rowCount, batchSize, (double) rowCount / batchSize,
                 batchSize / stopwatch.stop().elapsed(TimeUnit.MILLISECONDS) * 1000);
+        client.drain();
     }
 
     // Implement the BulkLoaderFailureCallBack for BulkLoader
