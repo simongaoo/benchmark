@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author zhangxu
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class TempTableGet {
     private static final Logger logger = LoggerFactory.getLogger(TempTableGet.class);
     private static String HOST;
+    private static AtomicInteger index = new AtomicInteger();
 
     static {
         try {
@@ -50,7 +52,7 @@ public class TempTableGet {
         int per = Integer.MAX_VALUE / 3;
         int prefix = block * per;
         for (int i = 0; i < batchSize; i++) {
-            int r = random.nextInt(per) + prefix;
+            int r = index.incrementAndGet();
             byte[] condition = ByteBuffer
                     .allocate(12)
                     .putInt(r)

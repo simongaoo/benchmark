@@ -11,18 +11,18 @@ import java.nio.ByteBuffer;
 import java.text.MessageFormat;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Application5 {
+    private static AtomicInteger index = new AtomicInteger();
+
     public static void bulkLoader(Client client, int block, int batchSize, int all) throws Exception {
         Stopwatch stopwatch = Stopwatch.createStarted();
         // Get a BulkLoader for the table we want to load, with a given batch size and one callback handles failures for any failed batches
         VoltBulkLoader bulkLoader = client.getNewBulkLoader("PAIR", batchSize, true,
                 new SessionBulkLoaderFailureCallback());
-        Random random = new Random();
-        int per = Integer.MAX_VALUE / 3;
-        int prefix = block * per;
         for (int i = 0; i < all; i++) {
-            int r = random.nextInt(per) + prefix;
+            int r = index.incrementAndGet();
             byte[] condition =
                     ByteBuffer.allocate(12)
                             .putInt(r)
